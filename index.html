@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Healing Hub — Your Space, Your Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   1. DESIGN TOKENS — CLAYMORPHISM
+   ============================================================ */
+:root{
+  --bg:#e8ecf7;
+  --clay:#edf0f9;
+  --clay-2:#e4e9f6;
+  --text:#3a3a55;
+  --muted:#7c7c98;
+  --violet:#8b7cf6;
+  --violet-d:#6f5de8;
+  --mint:#5fd6b4;
+  --peach:#ffb4a2;
+  --sun:#ffd98e;
+  --sky:#9fd8ff;
+  --sh-dark:rgba(160,175,205,.60);
+  --sh-light:rgba(255,255,255,.95);
+  --r-lg:34px;
+  --r-md:24px;
+  --r-sm:16px;
+  --ease:cubic-bezier(.22,.85,.28,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.65;
+  /* soft ambient background blobs */
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(139,124,246,.18), transparent 42%),
+    radial-gradient(circle at 88% 22%, rgba(95,214,180,.16), transparent 40%),
+    radial-gradient(circle at 50% 96%, rgba(255,180,162,.16), transparent 45%);
+  background-attachment:fixed;
+}
+
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;font-weight:700;letter-spacing:-.5px;line-height:1.15}
+
+img{max-width:100%;display:block}
+button{font-family:inherit}
+::selection{background:var(--violet);color:#fff}
+
+/* ============================================================
+   2. CUSTOM CURSOR
+   ============================================================ */
+.cursor-dot,.cursor-ring{
+  position:fixed;top:0;left:0;pointer-events:none;z-index:99999;
+  border-radius:50%;mix-blend-mode:multiply;
+}
+.cursor-dot{
+  width:8px;height:8px;background:var(--violet-d);
+  transition:width .25s,height .25s,background .25s;
+}
+.cursor-ring{
+  width:38px;height:38px;border:2px solid rgba(139,124,246,.55);
+  transition:width .3s var(--ease),height .3s var(--ease),
+             border-color .3s,background .3s,opacity .3s;
+}
+.cursor-ring.hovering{
+  width:64px;height:64px;background:rgba(139,124,246,.14);
+  border-color:rgba(139,124,246,.9);
+}
+.cursor-ring.clicking{width:26px;height:26px;background:rgba(95,214,180,.35)}
+@media (hover:none),(max-width:900px){
+  .cursor-dot,.cursor-ring{display:none}
+}
+
+/* ============================================================
+   3. CLAY UTILITIES
+   ============================================================ */
+.clay{
+  background:var(--clay);
+  border-radius:var(--r-lg);
+  box-shadow:
+    14px 14px 30px var(--sh-dark),
+   -14px -14px 30px var(--sh-light);
+}
+.clay-sm{
+  background:var(--clay);
+  border-radius:var(--r-md);
+  box-shadow:
+    8px 8px 18px var(--sh-dark),
+   -8px -8px 18px var(--sh-light);
+}
+.clay-inset{
+  background:var(--clay-2);
+  border-radius:var(--r-md);
+  box-shadow:
+    inset 8px 8px 18px var(--sh-dark),
+    inset -8px -8px 18px var(--sh-light);
+}
+
+/* ============================================================
+   4. BUTTONS + MAGNETIC
+   ============================================================ */
+.btn{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 34px;
+  border:none;border-radius:60px;
+  font-size:.95rem;font-weight:700;letter-spacing:.2px;
+  color:var(--text);background:var(--clay);
+  cursor:pointer;
+  box-shadow:8px 8px 18px var(--sh-dark), -8px -8px 18px var(--sh-light);
+  transition:box-shadow .28s var(--ease), transform .35s var(--ease), color .28s;
+  will-change:transform;
+}
+.btn:hover{box-shadow:4px 4px 10px var(--sh-dark), -4px -4px 10px var(--sh-light)}
+.btn:active{box-shadow:inset 6px 6px 14px var(--sh-dark), inset -6px -6px 14px var(--sh-light)}
+
+.btn-primary{
+  color:#fff;
+  background:linear-gradient(135deg,#9b8cff 0%, #7c6cf0 100%);
+  box-shadow:10px 10px 24px rgba(124,108,240,.45), -8px -8px 20px rgba(255,255,255,.85);
+}
+.btn-primary:hover{box-shadow:6px 6px 16px rgba(124,108,240,.5), -5px -5px 14px rgba(255,255,255,.9)}
+
+.btn-mint{
+  color:#0f6b53;
+  background:linear-gradient(135deg,#8ff0d3,#4fcfae);
+  box-shadow:10px 10px 24px rgba(79,207,174,.4), -8px -8px 20px rgba(255,255,255,.85);
+}
+
+.btn-sm{padding:10px 22px;font-size:.83rem}
+
+/* ============================================================
+   5. HEADER
+   ============================================================ */
+.header{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  width:min(1180px, calc(100% - 28px));
+  z-index:9000;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px 16px 12px 22px;
+  border-radius:60px;
+  background:rgba(237,240,249,.82);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:10px 10px 26px var(--sh-dark), -10px -10px 26px var(--sh-light);
+  transition:padding .3s var(--ease), box-shadow .3s;
+}
+.header.shrunk{padding:8px 14px 8px 20px;box-shadow:6px 8px 22px rgba(160,175,205,.75), -8px -8px 22px var(--sh-light)}
+
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.logo-mark{
+  width:44px;height:44px;border-radius:16px;flex:none;
+  display:grid;place-items:center;font-size:1.25rem;
+  background:linear-gradient(135deg,#b6a8ff,#7c6cf0);
+  color:#fff;
+  box-shadow:5px 5px 12px rgba(124,108,240,.45), -4px -4px 10px rgba(255,255,255,.9);
+  animation:pulseMark 5s ease-in-out infinite;
+}
+@keyframes pulseMark{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-4px) rotate(-6deg)}
+}
+.logo-text{font-family:'Fraunces',serif;font-size:1.22rem;font-weight:700;letter-spacing:-.4px;line-height:1.05}
+.logo-text small{display:block;font-family:'Plus Jakarta Sans';font-size:.6rem;font-weight:600;letter-spacing:2.4px;color:var(--muted);text-transform:uppercase}
+
+.nav{display:flex;align-items:center;gap:4px}
+.nav a{
+  position:relative;
+  padding:10px 15px;border-radius:40px;
+  color:var(--muted);text-decoration:none;
+  font-size:.88rem;font-weight:600;
+  transition:color .25s, background .25s, box-shadow .25s;
+}
+.nav a::after{
+  content:'';position:absolute;left:50%;bottom:5px;
+  width:0;height:3px;border-radius:3px;background:var(--violet);
+  transform:translateX(-50%);transition:width .3s var(--ease);
+}
+.nav a:hover{color:var(--violet-d)}
+.nav a:hover::after{width:22px}
+.nav a.active{color:var(--violet-d);background:rgba(139,124,246,.10)}
+
+.header-actions{display:flex;align-items:center;gap:10px}
+.user-chip{
+  display:none;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:40px;font-size:.82rem;font-weight:700;
+  background:linear-gradient(135deg,#8ff0d3,#4fcfae);color:#0d5f4a;
+  box-shadow:4px 4px 12px rgba(79,207,174,.4), -4px -4px 10px rgba(255,255,255,.8);
+}
+.user-chip.show{display:inline-flex}
+
+.burger{
+  display:none;width:46px;height:46px;border:none;border-radius:16px;
+  background:var(--clay);cursor:pointer;
+  box-shadow:5px 5px 12px var(--sh-dark), -5px -5px 12px var(--sh-light);
+}
+.burger span{display:block;width:19px;height:2.5px;margin:3.5px auto;border-radius:3px;background:var(--text);transition:.3s}
+
+/* ============================================================
+   6. HERO
+   ============================================================ */
+.section{width:min(1180px,calc(100% - 36px));margin-inline:auto;padding:88px 0}
+
+.hero{padding-top:170px;display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
+
+.pill{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 20px;border-radius:50px;
+  font-size:.76rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--violet-d);
+  background:var(--clay);
+  box-shadow:5px 5px 14px var(--sh-dark), -5px -5px 14px var(--sh-light);
+  margin-bottom:22px;
+}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);animation:blip 1.6s infinite}
+@keyframes blip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+
+.hero h1{
+  font-size:clamp(2.5rem,5.2vw,4.1rem);
+  margin-bottom:20px;
+}
+.hero h1 .word > span{
+  background:linear-gradient(120deg,#6f5de8 0%, #8b7cf6 45%, #4fcfae 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+
+.hero .caption{
+  font-size:1.08rem;color:var(--muted);max-width:520px;
+  min-height:3.4em;margin-bottom:30px;font-weight:500;
+}
+.typed-cursor{
+  display:inline-block;width:2.5px;height:1.05em;vertical-align:-3px;
+  background:var(--violet);margin-left:3px;animation:caret .9s steps(1) infinite;
+}
+@keyframes caret{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+.hero-cta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:38px}
+
+.hero-stats{display:flex;gap:34px;flex-wrap:wrap}
+.stat b{display:block;font-family:'Fraunces',serif;font-size:1.85rem;color:var(--violet-d);line-height:1}
+.stat span{font-size:.76rem;color:var(--muted);font-weight:600;letter-spacing:.5px}
+
+/* Hero art */
+.hero-art{position:relative;display:grid;place-items:center;min-height:440px}
+.art-card{
+  position:relative;width:100%;max-width:430px;padding:34px;
+  border-radius:44px;
+  background:var(--clay);
+  box-shadow:20px 20px 50px var(--sh-dark), -20px -20px 50px var(--sh-light);
+  animation:floatCard 7s ease-in-out infinite;
+}
+@keyframes floatCard{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
+
+.breath-orb{
+  width:100%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, #ffffff, #b9aeff 38%, #7c6cf0 100%);
+  box-shadow:
+    inset -18px -18px 40px rgba(80,60,180,.35),
+    inset 14px 14px 34px rgba(255,255,255,.6),
+    0 26px 60px rgba(124,108,240,.45);
+  animation:breathe 8s ease-in-out infinite;
+  position:relative;overflow:hidden;
+}
+.breath-orb::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 70% 75%, rgba(95,214,180,.5), transparent 55%);
+}
+@keyframes breathe{
+  0%,100%{transform:scale(.86)}
+  50%{transform:scale(1)}
+}
+.breath-label{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-family:'Fraunces',serif;font-size:1.05rem;color:#fff;
+  text-shadow:0 2px 12px rgba(70,50,160,.5);
+  letter-spacing:2px;pointer-events:none;
+}
+
+.float-tag{
+  position:absolute;padding:11px 18px;border-radius:26px;
+  font-size:.78rem;font-weight:700;background:var(--clay);color:var(--text);
+  box-shadow:8px 8px 20px var(--sh-dark), -8px -8px 20px var(--sh-light);
+  animation:floatCard 6s ease-in-out infinite;
+}
+.tag-1{top:8%;left:-6%;animation-delay:-1.5s}
+.tag-2{bottom:12%;right:-4%;animation-delay:-3s}
+
+/* ============================================================
+   7. SECTION HEADINGS
+   ============================================================ */
+.sec-head{text-align:center;max-width:720px;margin:0 auto 56px}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.8rem);margin-bottom:16px}
+.sec-head p{color:var(--muted);font-size:1rem}
+.sec-head .eyebrow{
+  display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:3px;
+  text-transform:uppercase;color:var(--mint);margin-bottom:14px;
+}
+
+/* ============================================================
+   8. IMPORTANCE CARDS
+   ============================================================ */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:28px}
+.card{
+  padding:34px 28px;border-radius:var(--r-lg);
+  background:var(--clay);
+  box-shadow:12px 12px 28px var(--sh-dark), -12px -12px 28px var(--sh-light);
+  transition:transform .45s var(--ease), box-shadow .45s var(--ease);
+}
+.card:hover{
+  transform:translateY(-10px);
+  box-shadow:18px 20px 40px var(--sh-dark), -14px -14px 34px var(--sh-light);
+}
+.card .ic{
+  width:62px;height:62px;border-radius:22px;display:grid;place-items:center;
+  font-size:1.6rem;margin-bottom:20px;
+  background:var(--clay-2);
+  box-shadow:inset 6px 6px 14px var(--sh-dark), inset -6px -6px 14px var(--sh-light);
+}
+.card h3{font-size:1.18rem;margin-bottom:10px}
+.card p{font-size:.9rem;color:var(--muted)}
+
+/* ============================================================
+   9. ABOUT COUNSELLOR
+   ============================================================ */
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:center}
+
+.photo-wrap{
+  position:relative;padding:22px;border-radius:46px;
+  background:var(--clay);
+  box-shadow:20px 20px 46px var(--sh-dark), -20px -20px 46px var(--sh-light);
+}
+.photo-inner{
+  border-radius:34px;overflow:hidden;aspect-ratio:4/5;
+  background:linear-gradient(150deg,#c9bfff,#8b7cf6 55%,#4fcfae);
+  display:grid;place-items:center;
+  box-shadow:inset 8px 8px 22px rgba(90,70,180,.3);
+  position:relative;
+}
+.photo-inner img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.photo-fallback{
+  font-family:'Fraunces',serif;font-size:4.4rem;color:#fff;
+  text-shadow:0 6px 24px rgba(70,50,160,.45);display:none;
+}
+.photo-inner.no-img .photo-fallback{display:block}
+
+.photo-badge{
+  position:absolute;bottom:-18px;right:-14px;
+  padding:14px 22px;border-radius:26px;
+  background:var(--clay);font-size:.8rem;font-weight:700;
+  box-shadow:10px 10px 24px var(--sh-dark), -10px -10px 24px var(--sh-light);
+  display:flex;align-items:center;gap:9px;
+}
+.photo-badge .dot{width:9px;height:9px;border-radius:50%;background:var(--mint);animation:blip 1.6s infinite}
+
+.about-text h2{font-size:clamp(1.8rem,3.4vw,2.6rem);margin-bottom:8px}
+.about-role{
+  font-size:.78rem;font-weight:800;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--violet-d);margin-bottom:22px;
+}
+.about-text p{color:var(--muted);font-size:.97rem;margin-bottom:18px}
+.about-text strong{color:var(--text);font-weight:700}
+
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 30px}
+.chip{
+  padding:10px 20px;border-radius:50px;font-size:.79rem;font-weight:700;color:var(--violet-d);
+  background:var(--clay);
+  box-shadow:5px 5px 13px var(--sh-dark), -5px -5px 13px var(--sh-light);
+}
+
+/* ============================================================
+   10. QUIZ
+   ============================================================ */
+.quiz-shell{
+  max-width:820px;margin:0 auto;padding:44px 40px;border-radius:44px;
+  background:var(--clay);
+  box-shadow:18px 18px 44px var(--sh-dark), -18px -18px 44px var(--sh-light);
+}
+.quiz-progress{
+  height:14px;border-radius:20px;overflow:hidden;margin-bottom:30px;
+  background:var(--clay-2);
+  box-shadow:inset 5px 5px 11px var(--sh-dark), inset -5px -5px 11px var(--sh-light);
+}
+.quiz-progress i{
+  display:block;height:100%;width:0%;border-radius:20px;
+  background:linear-gradient(90deg,#8b7cf6,#4fcfae);
+  transition:width .5s var(--ease);
+}
+.q-num{font-size:.75rem;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:var(--mint);margin-bottom:12px}
+.q-text{font-family:'Fraunces',serif;font-size:1.35rem;margin-bottom:26px;line-height:1.4}
+.q-options{display:grid;gap:14px}
+.q-opt{
+  display:flex;align-items:center;gap:14px;
+  padding:17px 22px;border-radius:22px;border:none;text-align:left;
+  font-size:.92rem;font-weight:600;color:var(--text);cursor:pointer;
+  background:var(--clay);
+  box-shadow:8px 8px 18px var(--sh-dark), -8px -8px 18px var(--sh-light);
+  transition:transform .3s var(--ease), box-shadow .3s, color .3s;
+}
+.q-opt .mark{
+  width:26px;height:26px;border-radius:50%;flex:none;
+  background:var(--clay-2);
+  box-shadow:inset 4px 4px 8px var(--sh-dark), inset -4px -4px 8px var(--sh-light);
+  transition:.3s;
+}
+.q-opt:hover{transform:translateX(6px);color:var(--violet-d)}
+.q-opt:hover .mark{background:linear-gradient(135deg,#b6a8ff,#7c6cf0)}
+.q-opt.chosen{color:#fff;background:linear-gradient(135deg,#9b8cff,#7c6cf0);box-shadow:6px 6px 18px rgba(124,108,240,.5), -6px -6px 16px rgba(255,255,255,.8)}
+.q-opt.chosen .mark{background:#fff}
+
+.quiz-nav{display:flex;justify-content:space-between;gap:14px;margin-top:30px}
+.quiz-result{text-align:center;padding:20px 6px}
+.quiz-result .score-ring{
+  width:170px;height:170px;margin:0 auto 26px;border-radius:50%;
+  display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--violet) var(--p,0%), var(--clay-2) 0);
+  box-shadow:14px 14px 32px var(--sh-dark), -14px -14px 32px var(--sh-light);
+}
+.quiz-result .score-ring::before{
+  content:'';position:absolute;inset:16px;border-radius:50%;
+  background:var(--clay);
+  box-shadow:inset 8px 8px 18px var(--sh-dark), inset -8px -8px 18px var(--sh-light);
+}
+.quiz-result .score-ring b{
+  position:relative;font-family:'Fraunces',serif;font-size:2.5rem;color:var(--violet-d);
+}
+.quiz-result .score-ring b small{font-size:.85rem;color:var(--muted);display:block;font-family:'Plus Jakarta Sans';font-weight:600;letter-spacing:1px}
+.quiz-result h3{font-size:1.6rem;margin-bottom:12px}
+.quiz-result p{color:var(--muted);max-width:520px;margin:0 auto 12px;font-size:.95rem}
+.quiz-note{
+  font-size:.76rem;color:var(--muted);margin-top:22px;padding-top:18px;
+  border-top:1px dashed rgba(124,124,152,.28);
+}
+
+/* ============================================================
+   11. BOOKING
+   ============================================================ */
+.book-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:34px;align-items:start}
+
+.book-panel{padding:38px 34px;border-radius:44px;background:var(--clay);
+  box-shadow:18px 18px 44px var(--sh-dark), -18px -18px 44px var(--sh-light)}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:.76rem;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.input{
+  width:100%;padding:15px 20px;border:none;border-radius:20px;
+  font-family:inherit;font-size:.93rem;color:var(--text);background:var(--clay-2);
+  box-shadow:inset 6px 6px 14px var(--sh-dark), inset -6px -6px 14px var(--sh-light);
+  outline:none;transition:box-shadow .3s;
+}
+.input:focus{box-shadow:inset 6px 6px 14px var(--sh-dark), inset -6px -6px 14px var(--sh-light), 0 0 0 3px rgba(139,124,246,.28)}
+textarea.input{resize:vertical;min-height:92px}
+
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:16px;margin-top:8px}
+.slot{
+  position:relative;padding:19px 14px;border:none;border-radius:22px;cursor:pointer;
+  font-size:.88rem;font-weight:700;color:var(--text);background:var(--clay);
+  box-shadow:7px 7px 16px var(--sh-dark), -7px -7px 16px var(--sh-light);
+  transition:transform .3s var(--ease), box-shadow .3s, color .3s, background .3s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.slot small{font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.65}
+.slot:hover:not(.booked){transform:translateY(-5px);color:var(--violet-d)}
+.slot.selected{
+  color:#fff;background:linear-gradient(135deg,#9b8cff,#7c6cf0);
+  box-shadow:5px 5px 16px rgba(124,108,240,.55), -5px -5px 14px rgba(255,255,255,.7);
+}
+.slot.booked{
+  cursor:not-allowed;color:#9a9ab0;background:var(--clay-2);
+  box-shadow:inset 6px 6px 14px var(--sh-dark), inset -6px -6px 14px var(--sh-light);
+  opacity:.72;
+}
+.slot.booked::after{
+  content:'Booked';position:absolute;top:9px;right:9px;
+  font-size:.55rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;background:#ffc9c0;color:#a33a2c;
+}
+.slot:disabled{pointer-events:none}
+
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:20px;font-size:.75rem;color:var(--muted);font-weight:600}
+.legend i{width:12px;height:12px;border-radius:5px;display:inline-block;margin-right:7px;vertical-align:-1px}
+.lg-free{background:var(--clay);box-shadow:2px 2px 5px var(--sh-dark), -2px -2px 5px var(--sh-light)}
+.lg-sel{background:linear-gradient(135deg,#9b8cff,#7c6cf0)}
+.lg-book{background:var(--clay-2);box-shadow:inset 2px 2px 4px var(--sh-dark)}
+
+/* side info card */
+.side-card{padding:32px 28px;border-radius:40px;background:var(--clay);
+  box-shadow:14px 14px 34px var(--sh-dark), -14px -14px 34px var(--sh-light);margin-bottom:26px}
+.side-card h4{font-family:'Fraunces',serif;font-size:1.15rem;margin-bottom:16px}
+.side-card ul{list-style:none;display:grid;gap:13px}
+.side-card li{display:flex;gap:12px;font-size:.85rem;color:var(--muted)}
+.side-card li span{font-size:1rem;flex:none}
+.wa-note{
+  padding:22px;border-radius:30px;text-align:center;
+  background:linear-gradient(135deg,#8ff0d3,#4fcfae);color:#0b5a45;
+  box-shadow:10px 10px 26px rgba(79,207,174,.42), -8px -8px 22px rgba(255,255,255,.8);
+}
+.wa-note b{display:block;font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px}
+.wa-note p{font-size:.8rem;font-weight:600;opacity:.85}
+
+/* ============================================================
+   12. GAME
+   ============================================================ */
+.game-wrap{
+  max-width:960px;margin:0 auto;padding:30px;border-radius:48px;
+  background:var(--clay);
+  box-shadow:20px 20px 48px var(--sh-dark), -20px -20px 48px var(--sh-light);
+}
+.game-hud{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:0 6px}
+.game-hud .score{
+  font-family:'Fraunces',serif;font-size:1.3rem;color:var(--violet-d);
+}
+.game-hud .score small{font-family:'Plus Jakarta Sans';font-size:.76rem;color:var(--muted);font-weight:700;display:block;letter-spacing:1.4px;text-transform:uppercase}
+.game-area{
+  position:relative;height:440px;border-radius:36px;overflow:hidden;
+  background:linear-gradient(180deg,#e6ebf9 0%, #dfe6f7 60%, #d8e6f6 100%);
+  box-shadow:inset 10px 10px 26px var(--sh-dark), inset -10px -10px 26px var(--sh-light);
+}
+.game-area .hint{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  color:var(--muted);font-size:.9rem;font-weight:600;pointer-events:none;padding:20px;
+  transition:opacity .6s;
+}
+.bubble{
+  position:absolute;bottom:-110px;border-radius:50%;cursor:pointer;
+  animation:rise linear forwards;
+  box-shadow:
+    inset -8px -8px 18px rgba(255,255,255,.65),
+    inset 7px 7px 16px rgba(90,80,160,.12),
+    0 12px 26px rgba(120,130,180,.28);
+  transition:transform .18s var(--ease);
+}
+.bubble:hover{transform:scale(1.08)}
+.bubble.pop{animation:popOut .34s var(--ease) forwards}
+@keyframes rise{
+  from{transform:translateY(0) translateX(0)}
+  to{transform:translateY(-600px) translateX(var(--drift,0px))}
+}
+@keyframes popOut{
+  0%{transform:scale(1);opacity:1}
+  55%{transform:scale(1.5);opacity:.7}
+  100%{transform:scale(.2);opacity:0}
+}
+.calm-msg{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  background:rgba(237,240,249,.86);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .6s;padding:30px;border-radius:36px;
+}
+.calm-msg.show{opacity:1;pointer-events:auto}
+.calm-msg h3{font-size:1.7rem;color:var(--violet-d);margin-bottom:12px}
+.calm-msg p{color:var(--muted);max-width:400px;font-size:.92rem;margin-bottom:22px}
+
+/* ============================================================
+   13. MODALS (AUTH + ADMIN)
+   ============================================================ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9500;display:grid;place-items:center;padding:22px;
+  background:rgba(58,58,85,.35);backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease);
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{
+  width:min(560px,100%);max-height:90vh;overflow-y:auto;
+  padding:38px 36px;border-radius:44px;position:relative;
+  background:var(--clay);
+  box-shadow:24px 24px 60px rgba(120,135,175,.55), -20px -20px 50px rgba(255,255,255,.9);
+  transform:translateY(34px) scale(.96);transition:transform .5s var(--ease);
+}
+.modal-overlay.open .modal{transform:none}
+.modal-wide{width:min(880px,100%)}
+.modal-close{
+  position:absolute;top:20px;right:20px;width:42px;height:42px;border:none;border-radius:15px;
+  background:var(--clay);cursor:pointer;font-size:1rem;color:var(--muted);
+  box-shadow:5px 5px 12px var(--sh-dark), -5px -5px 12px var(--sh-light);
+  transition:.25s;
+}
+.modal-close:hover{color:#e06a55;transform:rotate(90deg)}
+.modal h3{font-size:1.55rem;margin-bottom:6px}
+.modal .sub{font-size:.86rem;color:var(--muted);margin-bottom:26px}
+
+.tabs{display:flex;gap:8px;padding:7px;border-radius:50px;margin-bottom:28px;
+  background:var(--clay-2);
+  box-shadow:inset 5px 5px 12px var(--sh-dark), inset -5px -5px 12px var(--sh-light)}
+.tab{
+  flex:1;padding:12px 8px;border:none;border-radius:40px;cursor:pointer;
+  font-size:.8rem;font-weight:700;color:var(--muted);background:transparent;transition:.3s var(--ease);
+}
+.tab.active{
+  color:#fff;background:linear-gradient(135deg,#9b8cff,#7c6cf0);
+  box-shadow:4px 4px 12px rgba(124,108,240,.45), -3px -3px 10px rgba(255,255,255,.7);
+}
+.tab-panel{display:none;animation:fadeUp .5s var(--ease)}
+.tab-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.form-foot{text-align:center;font-size:.82rem;color:var(--muted);margin-top:18px}
+.form-foot a{color:var(--violet-d);font-weight:700;text-decoration:none;cursor:pointer}
+
+/* admin table */
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px;margin-bottom:26px}
+.a-stat{padding:20px;border-radius:26px;text-align:center;background:var(--clay);
+  box-shadow:8px 8px 20px var(--sh-dark), -8px -8px 20px var(--sh-light)}
+.a-stat b{display:block;font-family:'Fraunces',serif;font-size:1.8rem;color:var(--violet-d)}
+.a-stat span{font-size:.7rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.bookings-list{display:grid;gap:14px;max-height:340px;overflow-y:auto;padding-right:6px}
+.bk-row{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:18px 22px;border-radius:24px;background:var(--clay);
+  box-shadow:7px 7px 18px var(--sh-dark), -7px -7px 18px var(--sh-light);
+}
+.bk-row .info b{font-size:.92rem;display:block}
+.bk-row .info span{font-size:.76rem;color:var(--muted)}
+.bk-row .when{
+  font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--violet-d);background:rgba(139,124,246,.13);padding:6px 14px;border-radius:20px;
+}
+.empty-msg{text-align:center;color:var(--muted);font-size:.88rem;padding:40px 10px}
+
+/* ============================================================
+   14. TOAST
+   ============================================================ */
+.toast-wrap{position:fixed;bottom:26px;right:26px;z-index:9999;display:grid;gap:12px}
+.toast{
+  padding:15px 24px;border-radius:22px;font-size:.85rem;font-weight:700;
+  background:var(--clay);color:var(--text);
+  box-shadow:10px 10px 26px var(--sh-dark), -8px -8px 22px var(--sh-light);
+  animation:toastIn .45s var(--ease);
+  border-left:5px solid var(--mint);
+}
+.toast.err{border-left-color:#ff8a7a}
+.toast.info{border-left-color:var(--violet)}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px) scale(.9)}to{opacity:1;transform:none}}
+.toast.out{animation:toastOut .4s var(--ease) forwards}
+@keyframes toastOut{to{opacity:0;transform:translateX(40px) scale(.9)}}
+
+/* ============================================================
+   15. SCROLL REVEAL + TEXT REVEAL
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .95s var(--ease), transform .95s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal[data-dir="left"]{transform:translateX(-56px)}
+.reveal[data-dir="right"]{transform:translateX(56px)}
+.reveal[data-dir="left"].in,.reveal[data-dir="right"].in{transform:none}
+.reveal[data-dir="scale"]{transform:scale(.9)}
+.reveal[data-dir="scale"].in{transform:none}
+
+.word{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.06em}
+.word > span{display:inline-block;transform:translateY(112%);transition:transform 1s var(--ease);transition-delay:var(--d,0s)}
+.reveal-text.in .word > span{transform:translateY(0)}
+
+/* ============================================================
+   16. FOOTER
+   ============================================================ */
+footer{
+  margin-top:60px;padding:60px 0 34px;
+  border-top:1px solid rgba(160,175,205,.35);
+}
+.foot-grid{width:min(1180px,calc(100% - 36px));margin:0 auto;display:grid;
+  grid-template-columns:1.5fr 1fr 1fr;gap:40px}
+.foot-grid h5{font-family:'Fraunces',serif;font-size:1rem;margin-bottom:16px}
+.foot-grid p,.foot-grid a{font-size:.85rem;color:var(--muted);text-decoration:none;display:block;margin-bottom:9px;transition:color .25s}
+.foot-grid a:hover{color:var(--violet-d)}
+.foot-bottom{
+  width:min(1180px,calc(100% - 36px));margin:36px auto 0;padding-top:24px;
+  border-top:1px dashed rgba(124,124,152,.3);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:.78rem;color:var(--muted);
+}
+
+/* ============================================================
+   17. RESPONSIVE
+   ============================================================ */
+@media(max-width:1024px){
+  .hero{grid-template-columns:1fr;gap:44px;padding-top:150px}
+  .hero-art{order:-1;min-height:340px}
+  .about-grid{grid-template-columns:1fr;gap:56px}
+  .book-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:820px){
+  .nav{
+    position:absolute;top:calc(100% + 14px);left:0;right:0;
+    flex-direction:column;align-items:stretch;gap:4px;padding:16px;
+    border-radius:34px;background:rgba(237,240,249,.97);backdrop-filter:blur(18px);
+    box-shadow:12px 12px 30px var(--sh-dark), -12px -12px 30px var(--sh-light);
+    opacity:0;pointer-events:none;transform:translateY(-14px) scale(.97);
+    transition:.4s var(--ease);
+  }
+  .nav.open{opacity:1;pointer-events:auto;transform:none}
+  .nav a{padding:14px 18px;border-radius:22px}
+  .burger{display:block}
+  .header-actions .btn span.lbl{display:none}
+}
+@media(max-width:560px){
+  .section{padding:64px 0}
+  .quiz-shell{padding:30px 22px}
+  .book-panel{padding:28px 22px}
+  .modal{padding:30px 22px}
+  .game-wrap{padding:18px}
+  .game-area{height:360px}
+  .foot-grid{grid-template-columns:1fr}
+  .hero-stats{gap:22px}
+  .toast-wrap{left:18px;right:18px;bottom:18px}
+  .slot-grid{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ CUSTOM CURSOR ============ -->
+<div class="cursor-ring"></div>
+<div class="cursor-dot"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="logo" onclick="scrollTo({top:0,behavior:'smooth'})">
+    <div class="logo-mark">🌿</div>
+    <div class="logo-text">Healing Hub<small>Your Space</small></div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <a href="#home" class="nav-link active">Home</a>
+    <a href="#about" class="nav-link">About Us</a>
+    <a href="#test" class="nav-link">Test Yourself</a>
+    <a href="#book" class="nav-link">Book Session</a>
+    <a href="#game" class="nav-link">Peaceful Corner</a>
+  </nav>
+
+  <div class="header-actions">
+    <div class="user-chip" id="userChip">👤 <span id="userChipName">Guest</span></div>
+    <button class="btn btn-primary btn-sm magnetic" id="authBtn" onclick="openAuth()">
+      <span class="lbl">Login / Register</span> <span>→</span>
+    </button>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="section hero" id="home">
+  <div>
+    <div class="pill reveal"><span class="dot"></span> Campus Mental Wellness</div>
+
+    <h1 class="reveal-text" data-reveal-text>Your Space. Your Story.</h1>
+
+    <p class="caption" id="typedCaption"></p>
+
+    <div class="hero-cta">
+      <button class="btn btn-primary magnetic reveal" onclick="goBook()">Book a Session <span>🗓️</span></button>
+      <button class="btn magnetic reveal" onclick="document.getElementById('test').scrollIntoView()">Test Yourself <span>🧠</span></button>
+    </div>
+
+    <div class="hero-stats reveal">
+      <div class="stat"><b>6+</b><span>Years Experience</span></div>
+      <div class="stat"><b>1200+</b><span>Sessions Held</span></div>
+      <div class="stat"><b>100%</b><span>Confidential</span></div>
+    </div>
+  </div>
+
+  <div class="hero-art reveal" data-dir="scale">
+    <div class="art-card">
+      <div class="breath-orb"><div class="breath-label" id="breathLabel">BREATHE IN</div></div>
+    </div>
+    <div class="float-tag tag-1">💜 Safe &amp; Confidential</div>
+    <div class="float-tag tag-2">🌱 Heal at your pace</div>
+  </div>
+</section>
+
+<!-- ============ WHY MENTAL HEALTH MATTERS ============ -->
+<section class="section" id="why">
+  <div class="sec-head reveal">
+    <span class="eyebrow">Why It Matters</span>
+    <h2>Mental health is not a luxury — it's a foundation</h2>
+    <p>Just like physical health, your mind deserves care, rest and attention. Looking after it helps you study better, connect deeper and live lighter.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card reveal" data-dir="left">
+      <div class="ic">🧠</div>
+      <h3>Clarity in Chaos</h3>
+      <p>A healthy mind helps you focus on academics, make better decisions and handle pressure without crumbling.</p>
+    </div>
+    <div class="card reveal">
+      <div class="ic">💬</div>
+      <h3>Break the Silence</h3>
+      <p>Talking about how you feel reduces stigma. Sharing your story makes it easier for the next student to share theirs.</p>
+    </div>
+    <div class="card reveal">
+      <div class="ic">🫂</div>
+      <h3>Better Relationships</h3>
+      <p>Understanding your own emotions helps you build kinder, healthier bonds with friends, family and peers.</p>
+    </div>
+    <div class="card reveal" data-dir="right">
+      <div class="ic">🌤️</div>
+      <h3>Early Support Works</h3>
+      <p>Reaching out early prevents small struggles from growing into big ones. One conversation can change everything.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT COUNSELLOR ============ -->
+<section class="section" id="about">
+  <div class="about-grid">
+
+    <div class="photo-wrap reveal" data-dir="left">
+      <div class="photo-inner" id="photoInner">
+        <img src="mam.png" alt="Siya VK — Mental Health Consultant"
+             onerror="this.style.display='none'; document.getElementById('photoInner').classList.add('no-img');">
+        <div class="photo-fallback">SV</div>
+      </div>
+      <div class="photo-badge"><span class="dot"></span> Available for sessions</div>
+    </div>
+
+    <div class="about-text">
+      <span class="eyebrow reveal" style="font-size:.72rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--mint)">Meet Your Counsellor</span>
+      <h2 class="reveal">Welcome! I'm Siya VK</h2>
+      <div class="about-role reveal">Mental Health Consultant · Counselling &amp; Psychotherapy</div>
+
+      <p class="reveal">I'm a dedicated mental consultant with a passion for helping individuals find <strong>balance, resilience, and growth</strong> through life's challenges. With a background in Counselling and Psychotherapy, I have spent the last <strong>6 years</strong> supporting clients in their journeys toward mental well-being and personal fulfillment.</p>
+
+      <p class="reveal">My approach is warm, non-judgmental and completely student-centred. Whether you're dealing with exam stress, anxiety, relationship struggles, self-doubt or simply feeling stuck — this is a space where you can breathe, be heard, and begin to heal at your own pace.</p>
+
+      <div class="chips reveal">
+        <span class="chip">🧘 Anxiety &amp; Stress</span>
+        <span class="chip">📚 Academic Pressure</span>
+        <span class="chip">💔 Relationships</span>
+        <span class="chip">🌱 Self-Esteem</span>
+        <span class="chip">😴 Sleep &amp; Burnout</span>
+      </div>
+
+      <button class="btn btn-primary magnetic reveal" onclick="goBook()">Talk to Siya <span>💬</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEST YOURSELF ============ -->
+<section class="section" id="test">
+  <div class="sec-head reveal">
+    <span class="eyebrow">Test Yourself</span>
+    <h2>A gentle check-in with your mind</h2>
+    <p>8 quick questions about the last two weeks. There are no right or wrong answers — just honesty.</p>
+  </div>
+
+  <div class="quiz-shell reveal" data-dir="scale" id="quizShell">
+    <div class="quiz-progress"><i id="quizBar"></i></div>
+
+    <div id="quizBody">
+      <div class="q-num" id="qNum">Question 1 of 8</div>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-options" id="qOptions"></div>
+      <div class="quiz-nav">
+        <button class="btn btn-sm" id="qPrev" onclick="prevQ()">← Back</button>
+        <button class="btn btn-primary btn-sm magnetic" id="qNext" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BOOK APPOINTMENT ============ -->
+<section class="section" id="book">
+  <div class="sec-head reveal">
+    <span class="eyebrow">Appointments</span>
+    <h2>Book your session</h2>
+    <p>Pick a date and a free slot. Once a slot is booked, it locks instantly for everyone else.</p>
+  </div>
+
+  <div class="book-grid">
+
+    <!-- booking panel -->
+    <div class="book-panel reveal" data-dir="left">
+      <div class="field">
+        <label for="bkDate">Select Date</label>
+        <input type="date" class="input" id="bkDate" onchange="renderSlots()">
+      </div>
+
+      <div class="field">
+        <label>Available Slots</label>
+        <div class="slot-grid" id="slotGrid"></div>
+        <div class="legend">
+          <span><i class="lg-free"></i>Available</span>
+          <span><i class="lg-sel"></i>Selected</span>
+          <span><i class="lg-book"></i>Already Booked</span>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:26px">
+        <label for="bkNote">What would you like to talk about? <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="input" id="bkNote" placeholder="Share as much or as little as you like…"></textarea>
+      </div>
+
+      <button class="btn btn-mint magnetic" style="width:100%" onclick="confirmBooking()">
+        Confirm on WhatsApp <span>📲</span>
+      </button>
+      <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:14px">
+        Your booking is confirmed instantly on WhatsApp with our counsellor.
+      </p>
+    </div>
+
+    <!-- side info -->
+    <div>
+      <div class="side-card reveal" data-dir="right">
+        <h4>How it works</h4>
+        <ul>
+          <li><span>1️⃣</span> Login or register as a student.</li>
+          <li><span>2️⃣</span> Choose a date &amp; an open time slot.</li>
+          <li><span>3️⃣</span> Confirm — we open WhatsApp for you.</li>
+          <li><span>4️⃣</span> Your slot locks automatically.</li>
+          <li><span>5️⃣</span> Show up. Be heard. Heal. 🌿</li>
+        </ul>
+      </div>
+
+      <div class="wa-note reveal" data-dir="right">
+        <b>Session Mode</b>
+        <p>Online (Google Meet) or on-campus counselling room — whichever feels safer for you.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ PEACEFUL GAME ============ -->
+<section class="section" id="game">
+  <div class="sec-head reveal">
+    <span class="eyebrow">Peaceful Corner</span>
+    <h2>Pop some bubbles, quiet the noise</h2>
+    <p>No pressure, no timer, no losing. Just tap the floating bubbles and let your shoulders drop.</p>
+  </div>
+
+  <div class="game-wrap reveal" data-dir="scale">
+    <div class="game-hud">
+      <div class="score">Bubbles Popped<small id="scoreVal">0 / 20</small></div>
+      <button class="btn btn-sm magnetic" onclick="resetGame()">↺ Reset</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="hint" id="gameHint">🎈 Tap the bubbles as they float up…</div>
+      <div class="calm-msg" id="calmMsg">
+        <div>
+          <h3>You did it 🌿</h3>
+          <p>Now take one slow breath in… and let it out even slower. That calm feeling? You made it.</p>
+          <button class="btn btn-primary magnetic" onclick="resetGame()">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <h5>🌿 Healing Hub</h5>
+      <p>Your space. Your story. A safe, confidential counselling corner built for college students — because your mind matters as much as your marks.</p>
+    </div>
+    <div>
+      <h5>Explore</h5>
+      <a href="#home">Home</a>
+      <a href="#about">About Us</a>
+      <a href="#test">Test Yourself</a>
+      <a href="#book">Book a Session</a>
+    </div>
+    <div>
+      <h5>Reach Out</h5>
+      <a href="#" onclick="openWhatsApp('Hi Siya, I would like to know more about Healing Hub.');return false;">💬 WhatsApp</a>
+      <a href="mailto:hello@healinghub.in">✉️ hello@healinghub.in</a>
+      <a href="#game">🫧 Peaceful Corner</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© <span id="yr"></span> Healing Hub · Made with 💜 for students</span>
+    <span>If you're in crisis, please reach out to a trusted adult or a helpline immediately.</span>
+  </div>
+</footer>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <h3 id="authTitle">Welcome back</h3>
+    <p class="sub">Login, register or enter the admin panel.</p>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="userPanel">User Login</button>
+      <button class="tab" data-tab="adminPanel">Admin Login</button>
+      <button class="tab" data-tab="regPanel">Register</button>
+    </div>
+
+    <!-- USER LOGIN -->
+    <form class="tab-panel active" id="userPanel" onsubmit="return userLogin(event)">
+      <div class="field"><label>Email</label><input class="input" type="email" id="uEmail" placeholder="you@college.edu" required></div>
+      <div class="field"><label>Password</label><input class="input" type="password" id="uPass" placeholder="••••••••" required></div>
+      <button class="btn btn-primary magnetic" style="width:100%" type="submit">Login as Student →</button>
+      <p class="form-foot">New here? <a onclick="switchTab('regPanel')">Create an account</a></p>
+    </form>
+
+    <!-- ADMIN LOGIN -->
+    <form class="tab-panel" id="adminPanel" onsubmit="return adminLogin(event)">
+      <div class="field"><label>Admin Username</label><input class="input" id="aUser" placeholder="admin" required></div>
+      <div class="field"><label>Password</label><input class="input" type="password" id="aPass" placeholder="••••••••" required></div>
+      <button class="btn btn-primary magnetic" style="width:100%" type="submit">Enter Admin Panel →</button>
+      <p class="form-foot">Demo credentials — <b>admin</b> / <b>admin123</b></p>
+    </form>
+
+    <!-- REGISTER -->
+    <form class="tab-panel" id="regPanel" onsubmit="return registerUser(event)">
+      <div class="field"><label>Full Name</label><input class="input" id="rName" placeholder="Your name" required></div>
+      <div class="field"><label>Email</label><input class="input" type="email" id="rEmail" placeholder="you@college.edu" required></div>
+      <div class="field"><label>WhatsApp Number</label><input class="input" id="rPhone" placeholder="+91 98765 43210" required></div>
+      <div class="field"><label>Password</label><input class="input" type="password" id="rPass" placeholder="Min. 4 characters" minlength="4" required></div>
+      <button class="btn btn-mint magnetic" style="width:100%" type="submit">Create Account →</button>
+      <p class="form-foot">Already registered? <a onclick="switchTab('userPanel')">Login here</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ ADMIN DASHBOARD MODAL ============ -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeAdmin()">✕</button>
+    <h3>Admin Dashboard</h3>
+    <p class="sub">Manage all appointment bookings across dates.</p>
+
+    <div class="admin-stats">
+      <div class="a-stat"><b id="statTotal">0</b><span>Total Bookings</span></div>
+      <div class="a-stat"><b id="statToday">0</b><span>Today</span></div>
+      <div class="a-stat"><b id="statFree">0</b><span>Free Slots Today</span></div>
+    </div>
+
+    <div class="bookings-list" id="bookingsList"></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const WHATSAPP_NUMBER = "918111825125";   // ← change to Siya's real WhatsApp number
+const ADMIN_CREDS = { user: "admin", pass: "admin123" };
+
+const SLOTS = [
+  "10:30 - 11:30",
+  "11:30 - 12:30",
+  "12:30 - 01:30",
+  "02:00 - 03:00",
+  "03:00 - 04:00",
+  "04:00 - 05:00"
+];
+
+const LS_BOOKINGS = "hh_bookings";
+const LS_USERS    = "hh_users";
+const LS_SESSION  = "hh_session";
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function readLS(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+}
+function writeLS(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+function toast(msg, type = "success") {
+  const el = document.createElement("div");
+  el.className = "toast " + (type === "error" ? "err" : type === "info" ? "info" : "");
+  el.textContent = msg;
+  $("#toastWrap").appendChild(el);
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 400); }, 3200);
+}
+
+/* ============================================================
+   1. CUSTOM CURSOR
+   ============================================================ */
+(function cursor() {
+  const dot  = $(".cursor-dot");
+  const ring = $(".cursor-ring");
+  if (!dot || !ring) return;
+
+  let mx = innerWidth / 2, my = innerHeight / 2;
+  let rx = mx, ry = my;
+
+  addEventListener("mousemove", e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+  });
+
+  (function loop() {
+    rx += (mx - rx) * 0.16;
+    ry += (my - ry) * 0.16;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop);
+  })();
+
+  const hoverSel = "a, button, input, select, textarea, .slot, .bubble, .card, .q-opt, .tab, .chip";
+  document.addEventListener("mouseover", e => {
+    if (e.target.closest(hoverSel)) ring.classList.add("hovering");
+  });
+  document.addEventListener("mouseout", e => {
+    if (e.target.closest(hoverSel)) ring.classList.remove("hovering");
+  });
+  addEventListener("mousedown", () => ring.classList.add("clicking"));
+  addEventListener("mouseup",   () => ring.classList.remove("clicking"));
+})();
+
+/* ============================================================
+   2. MAGNETIC BUTTONS
+   ============================================================ */
+function initMagnetic() {
+  $$(".magnetic").forEach(el => {
+    if (el.dataset.mag) return;
+    el.dataset.mag = "1";
+    el.addEventListener("mousemove", e => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2;
+      const y = e.clientY - r.top - r.height / 2;
+      el.style.transform = `translate(${x * 0.26}px, ${y * 0.4}px)`;
+    });
+    el.addEventListener("mouseleave", () => { el.style.transform = ""; });
+  });
+}
+
+/* ============================================================
+   3. TEXT REVEAL (word by word)
+   ============================================================ */
+function initTextReveal() {
+  $$("[data-reveal-text]").forEach(el => {
+    const words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words
+      .map((w, i) => `<span class="word" style="--d:${i * 0.09}s"><span>${w}</span></span>`)
+      .join(" ");
+    el.classList.add("reveal-text");
+  });
+}
+
+/* ============================================================
+   4. TYPING EFFECT
+   ============================================================ */
+function initTyping() {
+  const target = $("#typedCaption");
+  const lines = [
+    "Take the first step towards better mental health.",
+    "You don't have to carry it alone anymore.",
+    "A safe, judgment-free space built just for students."
+  ];
+  let li = 0, ci = 0, deleting = false;
+
+  const cursorEl = document.createElement("span");
+  cursorEl.className = "typed-cursor";
+
+  function tick() {
+    const full = lines[li];
+    ci += deleting ? -1 : 1;
+    target.textContent = full.slice(0, ci);
+    target.appendChild(cursorEl);
+
+    let delay = deleting ? 32 : 58;
+
+    if (!deleting && ci === full.length) { delay = 2000; deleting = true; }
+    else if (deleting && ci === 0) { deleting = false; li = (li + 1) % lines.length; delay = 420; }
+
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
+/* ============================================================
+   5. SCROLL REVEAL + ACTIVE NAV
+   ============================================================ */
+function initScrollReveal() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add("in");
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.14, rootMargin: "0px 0px -60px 0px" });
+
+  $$(".reveal, .reveal-text").forEach(el => io.observe(el));
+}
+
+function initNavSpy() {
+  const links = $$(".nav-link");
+  const sections = links.map(a => $(a.getAttribute("href"))).filter(Boolean);
+
+  addEventListener("scroll", () => {
+    const y = scrollY + 160;
+    let idx = 0;
+    sections.forEach((s, i) => { if (s.offsetTop <= y) idx = i; });
+    links.forEach((l, i) => l.classList.toggle("active", i === idx));
+
+    $("#header").classList.toggle("shrunk", scrollY > 40);
+  }, { passive: true });
+}
+
+/* ============================================================
+   6. HEADER / MOBILE MENU
+   ============================================================ */
+$("#burger").addEventListener("click", () => $("#nav").classList.toggle("open"));
+$$(".nav-link").forEach(a => a.addEventListener("click", () => $("#nav").classList.remove("open")));
+
+/* ============================================================
+   7. BREATHING LABEL
+   ============================================================ */
+(function breathLabel() {
+  const el = $("#breathLabel");
+  if (!el) return;
+  let phase = 0;
+  const seq = ["BREATHE IN", "HOLD", "BREATHE OUT", "REST"];
+  setInterval(() => { phase = (phase + 1) % seq.length; el.textContent = seq[phase]; }, 2000);
+})();
+
+/* ============================================================
+   8. AUTH SYSTEM
+   ============================================================ */
+function openAuth()  { $("#authModal").classList.add("open"); document.body.style.overflow = "hidden"; }
+function closeAuth() { $("#authModal").classList.remove("open"); document.body.style.overflow = ""; }
+
+$$(".tab").forEach(t => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+
+function switchTab(id) {
+  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id));
+  $$(".tab-panel").forEach(p => p.classList.toggle("active", p.id === id));
+  $("#authTitle").textContent =
+    id === "adminPanel" ? "Admin access" :
+    id === "regPanel"   ? "Create your account" : "Welcome back";
+}
+
+function getSession() { return readLS(LS_SESSION, null); }
+
+function setSession(session) {
+  if (session) writeLS(LS_SESSION, session);
+  else localStorage.removeItem(LS_SESSION);
+  paintSession();
+}
+
+function paintSession() {
+  const s = getSession();
+  const chip = $("#userChip");
+  const btn  = $("#authBtn");
+
+  if (s) {
+    chip.classList.add("show");
+    $("#userChipName").textContent = s.role === "admin" ? "Admin" : s.name;
+    btn.innerHTML = `<span class="lbl">Logout</span> <span>⏏</span>`;
+    btn.onclick = logout;
+  } else {
+    chip.classList.remove("show");
+    btn.innerHTML = `<span class="lbl">Login / Register</span> <span>→</span>`;
+    btn.onclick = openAuth;
+  }
+  initMagnetic();
+}
+
+function logout() {
+  setSession(null);
+  toast("Logged out successfully.", "info");
+  closeAdmin();
+}
+
+function registerUser(e) {
+  e.preventDefault();
+  const name  = $("#rName").value.trim();
+  const email = $("#rEmail").value.trim().toLowerCase();
+  const phone = $("#rPhone").value.trim();
+  const pass  = $("#rPass").value;
+
+  const users = readLS(LS_USERS, []);
+  if (users.some(u => u.email === email)) { toast("This email is already registered.", "error"); return false; }
+
+  users.push({ name, email, phone, pass });
+  writeLS(LS_USERS, users);
+  setSession({ role: "user", name, email, phone });
+  closeAuth();
+  toast(`Welcome to Healing Hub, ${name.split(" ")[0]}! 🌿`);
+  e.target.reset();
+  return false;
+}
+
+function userLogin(e) {
+  e.preventDefault();
+  const email = $("#uEmail").value.trim().toLowerCase();
+  const pass  = $("#uPass").value;
+  const users = readLS(LS_USERS, []);
+  const found = users.find(u => u.email === email && u.pass === pass);
+
+  if (!found) { toast("Invalid email or password.", "error"); return false; }
+
+  setSession({ role: "user", name: found.name, email: found.email, phone: found.phone });
+  closeAuth();
+  toast(`Welcome back, ${found.name.split(" ")[0]}! 💜`);
+  e.target.reset();
+  return false;
+}
+
+function adminLogin(e) {
+  e.preventDefault();
+  const u = $("#aUser").value.trim();
+  const p = $("#aPass").value;
+
+  if (u !== ADMIN_CREDS.user || p !== ADMIN_CREDS.pass) {
+    toast("Invalid admin credentials.", "error");
+    return false;
+  }
+  setSession({ role: "admin", name: "Admin" });
+  closeAuth();
+  toast("Admin panel unlocked 🔓");
+  openAdmin();
+  e.target.reset();
+  return false;
+}
+
+/* ============================================================
+   9. BOOKINGS STORE
+   ============================================================ */
+function getBookings() { return readLS(LS_BOOKINGS, []); }
+function saveBookings(list) { writeLS(LS_BOOKINGS, list); }
+
+/* Seed demo booking: 10:30–11:30 booked for today */
+(function seed() {
+  const key = "hh_seeded_v1";
+  if (localStorage.getItem(key)) return;
+  const list = getBookings();
+  const date = todayISO();
+  if (!list.some(b => b.date === date && b.slot === SLOTS[0])) {
+    list.push({
+      id: "seed-" + Date.now(),
+      date,
+      slot: SLOTS[0],
+      name: "Reserved",
+      email: "—",
+      phone: "—",
+      note: "Pre-booked slot",
+      createdAt: new Date().toISOString()
+    });
+    saveBookings(list);
+  }
+  localStorage.setItem(key, "1");
+})();
+
+function isBooked(date, slot) {
+  return getBookings().some(b => b.date === date && b.slot === slot);
+}
+
+/* ============================================================
+   10. SLOT RENDERING + BOOKING
+   ============================================================ */
+let selectedSlot = null;
+
+function initBookingDate() {
+  const inp = $("#bkDate");
+  inp.value = todayISO();
+  inp.min = todayISO();
+  renderSlots();
+}
+
+function renderSlots() {
+  const date = $("#bkDate").value || todayISO();
+  const grid = $("#slotGrid");
+  grid.innerHTML = "";
+  selectedSlot = null;
+
+  SLOTS.forEach(slot => {
+    const booked = isBooked(date, slot);
+    const btn = document.createElement("button");
+    btn.className = "slot" + (booked ? " booked" : "");
+    btn.type = "button";
+    btn.disabled = booked;
+    btn.innerHTML = `<span>${slot}</span><small>${booked ? "Unavailable" : "Available"}</small>`;
+
+    if (!booked) {
+      btn.addEventListener("click", () => {
+        $$(".slot").forEach(s => s.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedSlot = slot;
+      });
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function confirmBooking() {
+  const session = getSession();
+
+  if (!session || session.role !== "user") {
+    toast("Please login as a student to book a slot.", "error");
+    openAuth();
+    return;
+  }
+
+  const date = $("#bkDate").value;
+  if (!date) { toast("Please select a date.", "error"); return; }
+  if (!selectedSlot) { toast("Please pick an available time slot.", "error"); return; }
+
+  // Re-check availability (slot may have been taken in another tab)
+  if (isBooked(date, selectedSlot)) {
+    toast("Sorry — that slot was just booked by someone else.", "error");
+    renderSlots();
+    return;
+  }
+
+  const note = $("#bkNote").value.trim();
+  const list = getBookings();
+
+  list.push({
+    id: "bk-" + Date.now(),
+    date,
+    slot: selectedSlot,
+    name: session.name,
+    email: session.email,
+    phone: session.phone || "—",
+    note: note || "—",
+    createdAt: new Date().toISOString()
+  });
+  saveBookings(list);
+
+  // Lock the slot immediately for everyone
+  renderSlots();
+
+  // Open WhatsApp with a pre-filled message
+  const msg =
+`Hello Siya 🌿
+I'd like to book a counselling session.
+
+👤 Name: ${session.name}
+📧 Email: ${session.email}
+📱 Phone: ${session.phone || "—"}
+📅 Date: ${formatDate(date)}
+⏰ Slot: ${selectedSlot}
+📝 Note: ${note || "—"}
+
+Booked via Healing Hub.`;
+
+  openWhatsApp(msg);
+
+  $("#bkNote").value = "";
+  toast("Slot locked! WhatsApp is opening… ✅");
+}
+
+function openWhatsApp(text) {
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  window.open(url, "_blank");
+}
+
+function formatDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+}
+
+function goBook() {
+  const s = getSession();
+  if (!s || s.role !== "user") {
+    toast("Login or register first to book a session.", "info");
+    openAuth();
+    return;
+  }
+  $("#book").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ============================================================
+   11. ADMIN DASHBOARD
+   ============================================================ */
+function openAdmin() {
+  if (getSession()?.role !== "admin") { openAuth(); switchTab("adminPanel"); return; }
+  renderAdmin();
+  $("#adminModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeAdmin() {
+  $("#adminModal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderAdmin() {
+  const list  = getBookings().sort((a, b) => (a.date + a.slot).localeCompare(b.date + b.slot));
+  const today = todayISO();
+
+  $("#statTotal").textContent = list.length;
+  $("#statToday").textContent = list.filter(b => b.date === today).length;
+  $("#statFree").textContent  = SLOTS.filter(s => !isBooked(today, s)).length;
+
+  const wrap = $("#bookingsList");
+  if (!list.length) {
+    wrap.innerHTML = `<div class="empty-msg">No bookings yet. 🌱</div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(b => `
+    <div class="bk-row">
+      <div class="info">
+        <b>${escapeHtml(b.name)}</b>
+        <span>${escapeHtml(b.email)} · ${escapeHtml(b.phone)}</span>
+        ${b.note && b.note !== "—" ? `<span style="display:block;margin-top:4px">📝 ${escapeHtml(b.note)}</span>` : ""}
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="when">${formatDate(b.date)} · ${b.slot}</span>
+        <button class="btn btn-sm" onclick="cancelBooking('${b.id}')" title="Cancel booking">✕</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function cancelBooking(id) {
+  const list = getBookings().filter(b => b.id !== id);
+  saveBookings(list);
+  renderAdmin();
+  renderSlots();
+  toast("Booking cancelled — slot is free again.", "info");
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+/* ============================================================
+   12. MENTAL HEALTH QUIZ
+   ============================================================ */
+const QUESTIONS = [
+  { q: "Over the past two weeks, how often have you felt down, low or hopeless?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you had little interest or pleasure in things you usually enjoy?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you had trouble falling asleep, staying asleep, or slept too much?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you felt nervous, anxious or on edge?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you found it hard to concentrate on studies or daily tasks?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you felt lonely or disconnected from people around you?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you felt tired or had very little energy?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },
+  { q: "How often have you felt overwhelmed by academic pressure or expectations?",
+    a: ["Not at all", "Several days", "More than half the days", "Nearly every day"] }
+];
+
+let qIndex = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+function renderQuiz() {
+  const body = $("#quizBody");
+  if (qIndex >= QUESTIONS.length) { renderResult(); return; }
+
+  const item = QUESTIONS[qIndex];
+
+  $("#qNum").textContent = `Question ${qIndex + 1} of ${QUESTIONS.length}`;
+  $("#qText").textContent = item.q;
+  $("#quizBar").style.width = `${(qIndex / QUESTIONS.length) * 100}%`;
+
+  const optWrap = $("#qOptions");
+  optWrap.innerHTML = "";
+  item.a.forEach((label, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "q-opt" + (answers[qIndex] === i ? " chosen" : "");
+    b.innerHTML = `<span class="mark"></span><span>${label}</span>`;
+    b.addEventListener("click", () => {
+      answers[qIndex] = i;
+      $$(".q-opt", optWrap).forEach(o => o.classList.remove("chosen"));
+      b.classList.add("chosen");
+      setTimeout(() => { if (qIndex < QUESTIONS.length - 1) { qIndex++; renderQuiz(); } }, 280);
+    });
+    optWrap.appendChild(b);
+  });
+
+  $("#qPrev").style.visibility = qIndex === 0 ? "hidden" : "visible";
+  $("#qNext").textContent = qIndex === QUESTIONS.length - 1 ? "See Result →" : "Next →";
+}
+
+function nextQ() {
+  if (answers[qIndex] === null) { toast("Please choose an option to continue.", "info"); return; }
+  if (qIndex === QUESTIONS.length - 1) { renderResult(); return; }
+  qIndex++;
+  renderQuiz();
+}
+
+function prevQ() {
+  if (qIndex > 0) { qIndex--; renderQuiz(); }
+}
+
+function renderResult() {
+  if (answers.includes(null)) {
+    const first = answers.indexOf(null);
+    qIndex = first;
+    toast("Please answer all questions first.", "info");
+    renderQuiz();
+    return;
+  }
+
+  const score = answers.reduce((a, b) => a + b, 0);
+  const max = QUESTIONS.length * 3;
+  const pct = Math.round((score / max) * 100);
+
+  let title, msg, emoji, color;
+  if (score <= 6)       { title = "You're doing well 🌿"; emoji = "🌿"; color = "#5fd6b4";
+    msg = "Your responses suggest you're in a fairly steady place right now. Keep nurturing your sleep, connections and downtime — and check in with yourself regularly."; }
+  else if (score <= 12) { title = "A little stressed 🌤️"; emoji = "🌤️"; color = "#ffd98e";
+    msg = "You're showing some mild signs of stress or low mood. Rest, talk to someone you trust, and try small daily habits that ground you. A session could help you untangle things."; }
+  else if (score <= 18) { title = "You're carrying a lot 💜"; emoji = "💜"; color = "#8b7cf6";
+    msg = "Your responses suggest moderate distress. You don't have to manage this alone — talking to a counsellor can make a real difference. Please consider booking a session."; }
+  else                  { title = "Please reach out 🌱"; emoji = "🌱"; color = "#ffb4a2";
+    msg = "You seem to be going through a really heavy time. This is not your fault, and support is available. Please talk to our counsellor or someone you trust as soon as you can."; }
+
+  $("#quizBar").style.width = "100%";
+
+  $("#quizBody").innerHTML = `
+    <div class="quiz-result">
+      <div class="score-ring" style="--p:${pct}%">
+        <b>${score}<small>out of ${max}</small></b>
+      </div>
+      <h3>${title}</h3>
+      <p>${msg}</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px">
+        <button class="btn btn-primary magnetic" onclick="goBook()">Book a Session 💬</button>
+        <button class="btn magnetic" onclick="restartQuiz()">Retake Quiz ↺</button>
+      </div>
+      <p class="quiz-note">⚠️ This check-in is a self-reflection tool only and is <b>not a medical diagnosis</b>. If you're in crisis, please contact a trusted adult or a mental health helpline immediately.</p>
+    </div>
+  `;
+  initMagnetic();
+}
+
+function restartQuiz() {
+  qIndex = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  $("#quizBody").innerHTML = `
+    <div class="q-num" id="qNum">Question 1 of 8</div>
+    <div class="q-text" id="qText">Loading…</div>
+    <div class="q-options" id="qOptions"></div>
+    <div class="quiz-nav">
+      <button class="btn btn-sm" id="qPrev" onclick="prevQ()">← Back</button>
+      <button class="btn btn-primary btn-sm magnetic" id="qNext" onclick="nextQ()">Next →</button>
+    </div>`;
+  renderQuiz();
+  $("#test").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ============================================================
+   13. PEACEFUL BUBBLE GAME
+   ============================================================ */
+const gameArea = $("#gameArea");
+const COLORS = ["#a99bff", "#7fe3c4", "#ffc3b1", "#ffd98e", "#9fd8ff", "#d7b6ff"];
+const GOAL = 20;
+
+let score = 0;
+let spawnTimer = null;
+let gameRunning = false;
+
+function spawnBubble() {
+  if (!gameRunning) return;
+  if (gameArea.querySelectorAll(".bubble").length > 12) return;
+
+  const size = 38 + Math.random() * 46;
+  const b = document.createElement("div");
+  b.className = "bubble";
+  b.style.width = b.style.height = size + "px";
+  b.style.left = Math.random() * Math.max(10, gameArea.clientWidth - size - 10) + "px";
+  b.style.animationDuration = (7 + Math.random() * 6) + "s";
+  b.style.setProperty("--drift", (Math.random() * 90 - 45) + "px");
+
+  const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+  b.style.background = `radial-gradient(circle at 30% 26%, rgba(255,255,255,.95), ${c})`;
+
+  b.addEventListener("click", () => popBubble(b));
+  b.addEventListener("animationend", () => b.remove());
+
+  gameArea.appendChild(b);
+}
+
+function popBubble(b) {
+  if (b.dataset.popped) return;
+  b.dataset.popped = "1";
+  b.classList.add("pop");
+  setTimeout(() => b.remove(), 360);
+
+  score++;
+  $("#scoreVal").textContent = `${score} / ${GOAL}`;
+  if (score === 1) $("#gameHint").style.opacity = "0";
+
+  if (score >= GOAL) showCalm();
+}
+
+function showCalm() {
+  $("#calmMsg").classList.add("show");
+}
+
+function resetGame() {
+  $$(".bubble", gameArea).forEach(b => b.remove());
+  score = 0;
+  $("#scoreVal").textContent = `0 / ${GOAL}`;
+  $("#calmMsg").classList.remove("show");
+  $("#gameHint").style.opacity = "1";
+}
+
+/* start / stop spawner based on visibility */
+const gameObserver = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) {
+      gameRunning = true;
+      if (!spawnTimer) {
+        spawnBubble();
+        spawnTimer = setInterval(spawnBubble, 850);
+      }
+    } else {
+      gameRunning = false;
+      clearInterval(spawnTimer);
+      spawnTimer = null;
+    }
+  });
+}, { threshold: 0.2 });
+gameObserver.observe(gameArea);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { gameRunning = false; clearInterval(spawnTimer); spawnTimer = null; }
+});
+
+/* ============================================================
+   14. MISC + INIT
+   ============================================================ */
+$("#yr").textContent = new Date().getFullYear();
+
+// close modals on overlay click / ESC
+$$(".modal-overlay").forEach(ov => {
+  ov.addEventListener("click", e => {
+    if (e.target === ov) {
+      ov.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+  });
+});
+addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    $$(".modal-overlay").forEach(o => o.classList.remove("open"));
+    document.body.style.overflow = "";
+  }
+});
+
+// init
+initTextReveal();
+initMagnetic();
+initTyping();
+initScrollReveal();
+initNavSpy();
+initBookingDate();
+paintSession();
+renderQuiz();
+
+// slight delay so hero text reveal plays nicely
+setTimeout(() => $$(".hero .reveal-text").forEach(el => el.classList.add("in")), 180);
+</script>
+</body>
+</html>
